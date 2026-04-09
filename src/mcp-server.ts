@@ -222,14 +222,14 @@ export function configureMcpServerInstance(server: McpServer): void {
                         searchRegex = new RegExp(searchPattern, flags);
                     } catch (error) {
                         // If regex is invalid, escape special characters and treat as literal
-                        const escapedPattern = searchPattern.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&');
+                        const escapedPattern = searchPattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                         const flags = caseSensitive ? (replaceAll ? 'g' : '') : (replaceAll ? 'gi' : 'i');
                         searchRegex = new RegExp(escapedPattern, flags);
                         regexInvalidFallback = true;
                     }
                 } else {
                     // Escape the search pattern for literal matching
-                    const escapedPattern = searchPattern.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&');
+                    const escapedPattern = searchPattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                     const flags = caseSensitive ? (replaceAll ? 'g' : '') : (replaceAll ? 'gi' : 'i');
                     searchRegex = new RegExp(escapedPattern, flags);
                 }
