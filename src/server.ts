@@ -115,6 +115,19 @@ const handleSessionRequest = async (
 // Handle GET requests for server-to-client notifications via SSE
 app.get('/mcp', (req, res) => {
     handleSessionRequest(req, res);
+
+    // Send periodic SSE comment heartbeats to keep the connection alive.
+    // Lines starting with ':' are SSE comments — ignored by clients but
+    // prevent idle-timeout disconnects from proxies and HTTP clients.
+    const heartbeat = setInterval(() => {
+        if (!res.writableEnded) {
+            res.write(': heartbeat\n\n');
+        } else {
+            clearInterval(heartbeat);
+        }
+    }, 30_000);
+    res.on('close', () => clearInterval(heartbeat));
+    res.on('error', () => clearInterval(heartbeat));
 });
 
 // Handle DELETE requests for session termination
