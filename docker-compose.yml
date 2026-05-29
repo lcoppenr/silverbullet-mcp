@@ -1,24 +1,37 @@
 services:
   silverbullet:
     image: ghcr.io/silverbulletmd/silverbullet:v2
+    restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
-      - SB_AUTH_TOKEN=${SB_AUTH_TOKEN}
+      - SB_AUTH_TOKEN=${SB_AUTH_TOKEN}   # Bearer auth for the HTTP API (used by MCP server)
+      - SB_USER=${SB_USER}               # basic-auth login for the human web UI (user:pass)
       - SB_FOLDER=/space
     volumes:
       - ./space:/space
+    networks:
+      - default
+      - NPM-Proxy
 
   silverbullet-mcp-server:
     build: .
+    restart: unless-stopped
     ports:
       - "4000:4000"
     environment:
-      - SB_AUTH_TOKEN=${SB_AUTH_TOKEN} # For mcp-server to auth with SilverBullet API
-      - MCP_TOKEN=${MCP_TOKEN}         # For clients to auth with mcp-server
+      - SB_AUTH_TOKEN=${SB_AUTH_TOKEN}   # to auth with SilverBullet
+      - MCP_TOKEN=${MCP_TOKEN}           # clients auth to this server with this
       - DEBUG_REQUESTS=${DEBUG_REQUESTS}
-      - SB_API_BASE_URL=http://silverbullet:3000 # For mcp-server to find SilverBullet
+      - SB_API_BASE_URL=http://silverbullet:3000
       - PORT=4000
-    # No direct volume mount needed for /space if using API exclusively
     depends_on:
       - silverbullet
+    networks:
+      - default
+      - NPM-Proxy
+
+networks:
+  default:
+  NPM-Proxy:
+    external: true
