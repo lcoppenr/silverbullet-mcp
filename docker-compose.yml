@@ -15,7 +15,8 @@ services:
       - NPM-Proxy
 
   silverbullet-mcp-server:
-    build: .
+    image: ghcr.io/lcoppenr/silverbullet-mcp:latest
+    pull_policy: always
     restart: unless-stopped
     ports:
       - "4000:4000"
